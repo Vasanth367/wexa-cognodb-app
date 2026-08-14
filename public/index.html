@@ -1,1 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Paper Trail — Research Collaboration Explorer</title>
+<link rel="stylesheet" href="styles.css" />
+<script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+  <div id="db-banner" class="banner hidden"></div>
 
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <span class="brand-name">Paper Trail</span>
+    </div>
+    <p class="tagline">A research collaboration &amp; citation graph, powered by CognoDB</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="explore">Explore an Author</button>
+    <button class="tab" data-tab="citation">Citation Trail</button>
+    <button class="tab" data-tab="recommend">Recommend Collaborators</button>
+    <button class="tab" data-tab="influence">Topic Influence</button>
+    <button class="tab" data-tab="path">Shortest Path</button>
+  </nav>
+
+  <main>
+    <!-- EXPLORE -->
+    <section id="panel-explore" class="panel active">
+      <p class="panel-desc">Search for a researcher to see their papers, co-authors, and a two-hop collaboration network.</p>
+      <div class="search-row">
+        <input id="explore-search" type="text" placeholder="Search authors by name…" autocomplete="off" />
+      </div>
+      <div id="explore-results" class="result-list"></div>
+      <div id="explore-empty" class="empty-state hidden">Search for an author above to get started.</div>
+      <div id="explore-detail" class="detail hidden">
+        <div class="detail-header">
+          <h2 id="explore-name"></h2>
+          <p id="explore-meta" class="muted"></p>
+        </div>
+        <div id="explore-network" class="network-canvas"></div>
+        <h3>Papers</h3>
+        <ul id="explore-papers" class="paper-list"></ul>
+      </div>
+    </section>
+
+    <!-- CITATION TRAIL -->
+    <section id="panel-citation" class="panel">
+      <p class="panel-desc">Trace the citation chain between two papers — a multi-hop traversal along <code>CITES</code> edges.</p>
+      <div class="two-col">
+        <div>
+          <label>From paper</label>
+          <input id="citation-from-search" type="text" placeholder="Search papers…" autocomplete="off" />
+          <div id="citation-from-results" class="result-list small"></div>
+          <div id="citation-from-picked" class="picked-chip hidden"></div>
+        </div>
+        <div>
+          <label>To paper</label>
+          <input id="citation-to-search" type="text" placeholder="Search papers…" autocomplete="off" />
+          <div id="citation-to-results" class="result-list small"></div>
+          <div id="citation-to-picked" class="picked-chip hidden"></div>
+        </div>
+      </div>
+      <button id="citation-run" class="primary-btn" disabled>Find citation trail</button>
+      <div id="citation-loading" class="loading-state hidden">Tracing citation path…</div>
+      <div id="citation-empty" class="empty-state hidden">Pick a "from" and "to" paper, then run the query.</div>
+      <div id="citation-none" class="empty-state hidden">No citation path found between these two papers within 6 hops.</div>
+      <div id="citation-result" class="path-trail hidden"></div>
+    </section>
+
+    <!-- RECOMMEND -->
+    <section id="panel-recommend" class="panel">
+      <p class="panel-desc">Suggests new collaborators: people your co-authors have worked with, whom you haven't worked with yet.</p>
+      <div class="search-row">
+        <input id="recommend-search" type="text" placeholder="Search authors by name…" autocomplete="off" />
+      </div>
+      <div id="recommend-results" class="result-list"></div>
+      <div id="recommend-empty" class="empty-state hidden">Pick an author above to see suggested collaborators.</div>
+      <div id="recommend-loading" class="loading-state hidden">Finding recommendations…</div>
+      <div id="recommend-none" class="empty-state hidden">No collaborator suggestions found for this author yet.</div>
+      <ul id="recommend-list" class="rec-list hidden"></ul>
+    </section>
+
+    <!-- TOPIC INFLUENCE -->
+    <section id="panel-influence" class="panel">
+      <p class="panel-desc">Pick a topic to see which <em>other</em> topics its papers influence, traced through citations 1–2 hops out.</p>
+      <div class="search-row">
+        <select id="influence-topic"><option value="">Choose a topic…</option></select>
+      </div>
+      <div id="influence-loading" class="loading-state hidden">Tracing topic diffusion…</div>
+      <div id="influence-empty" class="empty-state hidden">Choose a topic above to see its downstream influence.</div>
+      <div id="influence-none" class="empty-state hidden">No cross-topic citations found for this topic yet.</div>
+      <ul id="influence-list" class="influence-list hidden"></ul>
+    </section>
+
+    <!-- SHORTEST PATH -->
+    <section id="panel-path" class="panel">
+      <p class="panel-desc">Find the shortest collaboration path between two researchers, hopping through shared papers.</p>
+      <div class="two-col">
+        <div>
+          <label>From author</label>
+          <input id="path-from-search" type="text" placeholder="Search authors…" autocomplete="off" />
+          <div id="path-from-results" class="result-list small"></div>
+          <div id="path-from-picked" class="picked-chip hidden"></div>
+        </div>
+        <div>
+          <label>To author</label>
+          <input id="path-to-search" type="text" placeholder="Search authors…" autocomplete="off" />
+          <div id="path-to-results" class="result-list small"></div>
+          <div id="path-to-picked" class="picked-chip hidden"></div>
+        </div>
+      </div>
+      <button id="path-run" class="primary-btn" disabled>Find shortest path</button>
+      <div id="path-loading" class="loading-state hidden">Searching…</div>
+      <div id="path-empty" class="empty-state hidden">Pick a "from" and "to" author, then run the query.</div>
+      <div id="path-none" class="empty-state hidden">No collaboration path found between these two authors.</div>
+      <div id="path-result" class="path-trail hidden"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Paper Trail — built for the Wexa AI CognoDB take-home assignment.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
